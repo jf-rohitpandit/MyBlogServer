@@ -1,8 +1,9 @@
 const epxress = require('express');
 const router = epxress.Router();
 const Blog = require('../models/blogModel');
+const verifyUser = require('../middlewares/authMiddleware');
 
-router.post('/', async (req, res) => {
+router.post('/', verifyUser, async (req, res) => {
 	try {
 		const { title, content } = req.body;
 		if (!title || !content) {
@@ -25,7 +26,7 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
 	try {
-		const posts = await Blog.find();
+		const posts = await Blog.find().select('-content -writer');
 
 		res.status(200).json({ posts });
 	} catch (error) {
@@ -35,11 +36,23 @@ router.get('/', async (req, res) => {
 
 router.get('/trending', async (req, res) => {
 	try {
-		const posts = await Blog.find();
+		const posts = await Blog.find().select('-content -writer');
 
 		res.status(200).json({ posts });
 	} catch (error) {
 		res.status(500).json({ message: 'some internal error occured' });
+	}
+});
+
+router.get('/post/:id', async (req, res) => {
+	try {
+		const { id } = req.params;
+		console.log(id);
+		const post = await Blog.findOne({ _id: id });
+		res.status(200).json({ post });
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ message: 'some internal error occured!' });
 	}
 });
 

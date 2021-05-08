@@ -5,7 +5,6 @@ const morgan = require('morgan');
 require('./db');
 const auth = require('./routes/auth');
 const blog = require('./routes/blog');
-const verifyUser = require('./middlewares/authMiddleware');
 
 app.use(cors());
 app.use(morgan('dev'));
@@ -19,7 +18,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', auth);
-app.use('/blog', verifyUser, blog);
+app.use('/blog', blog);
 
 app.listen(PORT, () => {
 	console.log('server live at port:', PORT);
