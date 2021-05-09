@@ -20,6 +20,10 @@ app.get('/', (req, res) => {
 app.use('/auth', auth);
 app.use('/blog', blog);
 
+app.get('*', (req, res) => {
+	res.status(404).send('Page not found');
+});
+
 app.listen(PORT, () => {
 	console.log('server live at port:', PORT);
 });
