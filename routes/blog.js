@@ -3,6 +3,7 @@ const router = epxress.Router();
 const jwt = require('jsonwebtoken');
 const Blog = require('../models/blogModel');
 const Likes = require('../models/likeModel');
+const Comments = require('../models/commentModel');
 const verifyUser = require('../middlewares/authMiddleware');
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -122,6 +123,52 @@ router.post('/like/:id', verifyUser, async (req, res) => {
 
 		await likes.save();
 		res.status(200).json({ likeCount: likes.users.length, liked: liked });
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ message: 'some internal error occured!' });
+	}
+});
+
+// Handling comments in the route
+router.get('/comment/:id', verifyUser, async (req, res) => {
+	try {
+		const { id } = req.params;
+		const comments = await Comments.findOne({ postId: id });
+		console.log(comments.commentList);
+		res.status(200).json({ commentList: comments.commentList });
+	} catch (error) {
+		res.status(500).json({ message: 'some internal error occured!' });
+	}
+});
+
+router.post('/comment/:id', verifyUser, async (req, res) => {
+	try {
+		const { text } = req.body;
+		const userId = req.userId;
+		const { id } = req.params;
+
+		let comments = await Comments.findOne({ postId: id });
+		console.log(comments);
+		if (!comments) {
+			comments = new Comments({
+				postId: id,
+				commentList: [
+					{
+						text: text,
+						user: userId,
+					},
+				],
+			});
+		} else {
+			const comment = {
+				text: text,
+				user: userId,
+			};
+			comments.commentList.push(comment);
+		}
+
+		await comments.save();
+		res.status(201).json({ commentList: comments.commentList });
 	} catch (error) {
 		console.log(error);
 		res.status(500).json({ message: 'some internal error occured!' });
