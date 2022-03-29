@@ -4,7 +4,7 @@ const commentSchema = mongoose.Schema({
   user: {
     type: mongoose.Types.ObjectId,
     required: true,
-    ref: 'User',
+    ref: 'user',
   },
   text: {
     type: String,
@@ -16,6 +16,7 @@ const commentsSchema = mongoose.Schema({
   postId: {
     type: mongoose.Types.ObjectId,
     required: true,
+    ref: 'blog',
   },
   commentList: [{ type: commentSchema }],
 })
